@@ -1,4 +1,4 @@
-package com.imran.cavista_assignment
+package com.imran.cavista
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
