@@ -1,9 +1,10 @@
-package com.imran.cavista
+package com.imran.cavista.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.imran.cavista.R
 
-class MainActivity : AppCompatActivity() {
+class ImageListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
