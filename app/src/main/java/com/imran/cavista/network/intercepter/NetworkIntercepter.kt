@@ -1,8 +1,10 @@
 package com.imran.cavista.network.intercepter
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import com.imran.cavista.util.NoInternetException
 import okhttp3.Interceptor
-import okhttp3.Request
 import okhttp3.Response
 
 /**
@@ -10,12 +12,28 @@ import okhttp3.Response
  */
 class NetworkInterceptor(context: Context) : Interceptor {
     private val appContext = context.applicationContext
+
     override fun intercept(chain: Interceptor.Chain): Response = chain.run {
-        val request: Request
-        //TODO: work here
-        request = request().newBuilder()
-            .cacheControl(cc)
-            .build()
-        proceed(request)
+        if (!isInternetAvailable()) {
+            throw NoInternetException("PLease check your internet connection")
+        }
+        proceed(chain.request())
+    }
+
+    private fun isInternetAvailable(): Boolean {
+        var result = false
+        val connectivityManager =
+            appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+        connectivityManager?.let {
+            it.getNetworkCapabilities(connectivityManager.activeNetwork)?.apply {
+                result = when {
+                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                    hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                    else -> false
+                }
+            }
+        }
+        return result
+
     }
 }

@@ -2,10 +2,10 @@ package com.imran.cavista.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.imran.cavista.model.ErrorModel
 import com.imran.cavista.model.ImageWrapper
 import com.imran.cavista.repository.ImageListRepository
 import com.imran.cavista.util.ApiException
+import com.imran.cavista.util.NoInternetException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 class ImageListViewModel(
     private val repository: ImageListRepository
 ) : ViewModel() {
-    var errorLiveDat = MutableLiveData<ErrorModel>()
+    var errorLiveDat = MutableLiveData<String>()
     val imageListLiveData = MutableLiveData<List<ImageWrapper>>()
     val imageList = mutableListOf<ImageWrapper>()
     var pageNumber: Int = 0
@@ -28,7 +28,9 @@ class ImageListViewModel(
             if (page == 1) imageList.clear()
             imageList.addAll(imagesResponse.data)
         } catch (exp: ApiException) {
-            errorLiveDat.postValue(exp.message?.let { ErrorModel(it, exp.code) })
+            errorLiveDat.postValue("Error: ${exp.message} - [ ${exp.code}]")
+        } catch (exp: NoInternetException) {
+            errorLiveDat.postValue(exp.message)
         }
     }
 
