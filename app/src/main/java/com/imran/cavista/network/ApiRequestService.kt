@@ -27,7 +27,7 @@ interface ApiRequestService {
     @GET("3/gallery/search/{page}")
     suspend fun getImages(
         @Path("page") page: Int,
-        @Query("q") searchValue: String??
+        @Query("q") searchValue: String?
     ): Response<ImagesResponse>
 
     companion object {

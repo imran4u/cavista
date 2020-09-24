@@ -1,6 +1,5 @@
 package com.imran.cavista.factory
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.imran.cavista.repository.ImageListRepository

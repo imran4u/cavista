@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.imran.cavista.R
+import com.imran.cavista.databinding.ActivityListImageBinding
 import com.imran.cavista.factory.ImageListViewModelFactory
+import com.imran.cavista.util.snackbar
 import com.imran.cavista.viewmodel.ImageListViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -20,14 +23,14 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
     private lateinit var mViewModel: ImageListViewModel
     private val factory: ImageListViewModelFactory by instance()
     override val kodein by kodein()
+    private lateinit var binding: ActivityListImageBinding
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list_image)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.image_list)
-
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_list_image)
         initialise()
         lifecycleScope.launch {
             mViewModel.getImages(1, "vanilla")
@@ -50,9 +53,8 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
             }
         })
 
-        mViewModel.errorLiveDat.observe(this, Observer {
-            //TODO: Work here
-            Log.d("imran", "Error: $it")
+        mViewModel.errorLiveDat.observe(this, {
+            binding.root.snackbar(it)
         })
 
     }
