@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.imran.cavista.R
 import com.imran.cavista.factory.ImageListViewModelFactory
 import com.imran.cavista.viewmodel.ImageListViewModel
+import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -24,6 +26,9 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
         setContentView(R.layout.activity_main)
 
         initalise()
+        lifecycleScope.launch {
+            mViewModel.getImages(1,"vanilla")
+        }
     }
 
     private fun initalise() {
@@ -31,12 +36,13 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
         mViewModel.imageListLiveData.observe(this, Observer { imageWrapperList ->
             //TODO: work here
             imageWrapperList.forEach {
-                Log.d("imran", "${it.title}, ${it.images[0].link}")
+                Log.d("imran", "${it.title}, ${it.images?.let {images-> images[0].link }}")
             }
         })
 
         mViewModel.errorLiveDat.observe(this, Observer {
             //TODO: Work here
+            Log.d("imran", "Error: $it")
         })
 
     }

@@ -1,6 +1,7 @@
 package com.imran.cavista.network
 
 import com.imran.cavista.model.ImagesResponse
+import com.imran.cavista.network.intercepter.HeaderInterceptor
 import com.imran.cavista.network.intercepter.NetworkInterceptor
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -23,16 +24,16 @@ const val BASE_URL = "https://api.imgur.com/"
 //https://api.imgur.com/3/gallery/search/1?q=vanilla
 interface ApiRequestService {
 
-    @GET("3/gallery/search/{page}?q=vanilla")
+    @GET("3/gallery/search/{page}")
     suspend fun getImages(
         @Path("page") page: Int,
-        @Query("q") searchValue: String?
+        @Query("q") searchValue: String??
     ): Response<ImagesResponse>
 
     companion object {
         operator fun invoke(
             networkInterceptor: NetworkInterceptor,
-            headerInterceptor: NetworkInterceptor,
+            headerInterceptor: HeaderInterceptor,
         ): ApiRequestService {
 
             val logging = HttpLoggingInterceptor()

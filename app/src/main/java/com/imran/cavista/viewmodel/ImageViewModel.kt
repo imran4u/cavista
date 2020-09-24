@@ -20,7 +20,7 @@ class ImageListViewModel(
     val imageList = mutableListOf<ImageWrapper>()
     var pageNumber: Int = 0
 
-    suspend fun getImages(page: Int, query: String) = withContext(Dispatchers.Main) {
+    suspend fun getImages(page: Int, query: String? = null) = withContext(Dispatchers.Main) {
         try {
             pageNumber = page
             val imagesResponse = repository.getImages(page, query)

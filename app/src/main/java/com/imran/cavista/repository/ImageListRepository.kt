@@ -9,7 +9,7 @@ import com.imran.cavista.network.intercepter.SafeApiRequest
  */
 class ImageListRepository(private val api: ApiRequestService) : SafeApiRequest() {
 
-    suspend fun getImages(page: Int, query: String): ImagesResponse {
+    suspend fun getImages(page: Int, query: String?): ImagesResponse {
         return apiRequest { api.getImages(page, query) }
     }
 }

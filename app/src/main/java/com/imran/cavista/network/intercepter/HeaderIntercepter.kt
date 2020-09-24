@@ -11,7 +11,7 @@ class HeaderInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response = chain.run {
         val builder: Request.Builder = request().newBuilder()
-            .addHeader("Application-Name", "android")
+            .addHeader("Authorization", "Client-ID 137cda6b5008a7c")
         proceed(builder.build())
     }
 

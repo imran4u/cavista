@@ -6,6 +6,5 @@ package com.imran.cavista.model
 data class ImageWrapper(
     val id: String,
     val title: String,
-    val images: List<Image>
-
+    val images: List<Image>?
 )
