@@ -1,4 +1,7 @@
 <resources>
-	<string name="app_name">Cavista-assignment</string>
+    <string name="app_name">Cavista-assignment</string>
     <string name="image_list">Image List</string>
+    <string name="submit">Submit</string>
+    <string name="enter_comment">Enter comment</string>
+    <string name="previous_comment">Previous comment</string>
 </resources>

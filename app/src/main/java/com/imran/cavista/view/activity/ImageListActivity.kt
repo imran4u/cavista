@@ -1,5 +1,6 @@
 package com.imran.cavista.view.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +13,9 @@ import com.imran.cavista.R
 import com.imran.cavista.databinding.ActivityListImageBinding
 import com.imran.cavista.factory.ImageListViewModelFactory
 import com.imran.cavista.model.ImageWrapper
+import com.imran.cavista.util.ConstantUtil.KEY_IMAGE_LINK
+import com.imran.cavista.util.ConstantUtil.KEY_IMAGE_TITLE
+import com.imran.cavista.util.ConstantUtil.KEY_IMAGE_WRAPPER_ID
 import com.imran.cavista.util.GridSpacingDecoration
 import com.imran.cavista.util.snackbar
 import com.imran.cavista.view.adapter.ImageListAdapter
@@ -71,7 +75,15 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
 
     private val itemClickListener = object : ItemClickListener {
         override fun itemClick(imageWrapper: ImageWrapper) {
-            //TODO: to work on it.
+            val intent = Intent(this@ImageListActivity, ImageDetailActivity::class.java)
+            var imageLink: String? = null
+            if (imageWrapper.images != null && imageWrapper.images.isNotEmpty()) {
+                imageLink = imageWrapper.images[0].link
+            }
+            intent.putExtra(KEY_IMAGE_TITLE, imageWrapper.title)
+            intent.putExtra(KEY_IMAGE_LINK, imageLink)
+            intent.putExtra(KEY_IMAGE_WRAPPER_ID, imageWrapper.id)
+            startActivity(intent)
         }
     }
 
