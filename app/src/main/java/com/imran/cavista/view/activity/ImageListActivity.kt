@@ -3,6 +3,7 @@ package com.imran.cavista.view.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -49,6 +50,7 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_list_image)
         initialise()
         lifecycleScope.launch {
+            progressView.visibility = View.VISIBLE
             mViewModel.getImages(1)
         }
     }
@@ -64,6 +66,12 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
         mViewModel = ViewModelProvider(this, mFactory).get(ImageListViewModel::class.java)
         mViewModel.imageListLiveData.observe(this, Observer { imageWrapperList ->
             mImageListAdapter.addAllData(imageWrapperList)
+            progressView.visibility = View.GONE
+            if (imageWrapperList.isEmpty()) {
+                noResultView.visibility = View.VISIBLE
+            } else {
+                noResultView.visibility = View.GONE
+            }
         })
 
         mViewModel.errorLiveDat.observe(this, {
