@@ -3,6 +3,7 @@ package com.imran.cavista.view.activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -22,6 +23,9 @@ import com.imran.cavista.view.adapter.ImageListAdapter
 import com.imran.cavista.view.adapter.ImageListAdapter.ItemClickListener
 import com.imran.cavista.viewmodel.ImageListViewModel
 import kotlinx.android.synthetic.main.activity_list_image.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -34,6 +38,8 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
     override val kodein by kodein()
     private lateinit var mBinding: ActivityListImageBinding
     private lateinit var mImageListAdapter: ImageListAdapter
+    private var queryJob: Job? = null
+    private val DEBOUNCE: Long = 250
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +49,7 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_list_image)
         initialise()
         lifecycleScope.launch {
-            mViewModel.getImages(1, "vanilla")
+            mViewModel.getImages(1)
         }
     }
 
@@ -60,6 +66,13 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
             mImageListAdapter.addAllData(imageWrapperList)
         })
 
+        mViewModel.errorLiveDat.observe(this, {
+            mBinding.root.snackbar(it)
+        })
+
+        //searchView
+        searchView.setOnQueryTextListener(queryTextListener)
+        searchView.onActionViewExpanded()
         //recyclerView
         val spanCount = 3
         recyclerView.layoutManager = GridLayoutManager(this, spanCount)
@@ -67,9 +80,25 @@ class ImageListActivity : AppCompatActivity(), KodeinAware {
         recyclerView.adapter = mImageListAdapter
         recyclerView.addItemDecoration(GridSpacingDecoration(spanCount, 16, false, 0))
 
-        mViewModel.errorLiveDat.observe(this, {
-            mBinding.root.snackbar(it)
-        })
+
+    }
+
+    private val queryTextListener = object : SearchView.OnQueryTextListener,
+        androidx.appcompat.widget.SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(p0: String?): Boolean {
+            // do nothing
+            return false
+        }
+
+        override fun onQueryTextChange(query: String?): Boolean {
+            queryJob?.cancel()
+            queryJob = lifecycleScope.launch(Dispatchers.Main) {
+                delay(DEBOUNCE)
+                mViewModel.getImages(1, query)
+            }
+
+            return true
+        }
 
     }
 

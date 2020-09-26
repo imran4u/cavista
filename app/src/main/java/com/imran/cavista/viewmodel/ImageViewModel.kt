@@ -19,10 +19,12 @@ class ImageListViewModel(
     val imageListLiveData = MutableLiveData<List<ImageWrapper>>()
     val imageList = mutableListOf<ImageWrapper>()
     var pageNumber: Int = 0
+    var queryText: String? = null
 
     suspend fun getImages(page: Int, query: String? = null) = withContext(Dispatchers.Main) {
         try {
             pageNumber = page
+            queryText = query
             val imagesResponse = repository.getImages(page, query)
             imageListLiveData.postValue(imagesResponse.data)
             if (page == 1) imageList.clear()
@@ -32,6 +34,10 @@ class ImageListViewModel(
         } catch (exp: NoInternetException) {
             errorLiveDat.postValue(exp.message)
         }
+    }
+
+    suspend fun getNextPage() {
+        getImages(++pageNumber, queryText)
     }
 
 }
