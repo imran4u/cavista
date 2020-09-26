@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.imran.cavista.R
 import com.imran.cavista.databinding.ActivityListImageBinding
+import com.imran.cavista.factory.ImageDetailsViewModelFactory
 import com.imran.cavista.factory.ImageListViewModelFactory
 import com.imran.cavista.model.ImageWrapper
 import com.imran.cavista.util.ConstantUtil.KEY_IMAGE_LINK
@@ -35,7 +36,8 @@ import org.kodein.di.generic.instance
 class ImageListActivity : AppCompatActivity(), KodeinAware {
 
     private lateinit var mViewModel: ImageListViewModel
-    private val mFactory: ImageListViewModelFactory by instance()
+//    private val mFactory: ImageListViewModelFactory by instance()
+    private val mFactory: ImageDetailsViewModelFactory by instance()
     override val kodein by kodein()
     private lateinit var mBinding: ActivityListImageBinding
     private lateinit var mImageListAdapter: ImageListAdapter

@@ -13,15 +13,29 @@ import androidx.appcompat.widget.AppCompatEditText;
 
 import com.bumptech.glide.Glide;
 import com.imran.cavista.R;
+import com.imran.cavista.application.CavistaApplication;
+import com.imran.cavista.factory.ImageDetailsViewModelFactory;
 import com.imran.cavista.util.ConstantUtil;
+import com.imran.cavista.viewmodel.ImageDetailsViewModel;
+
+import org.jetbrains.annotations.NotNull;
+import org.kodein.di.Kodein;
+import org.kodein.di.KodeinAware;
+import org.kodein.di.KodeinContext;
+import org.kodein.di.KodeinTrigger;
 
 /**
  * Created by imran on 2020-09-25.
  */
-public class ImageDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class ImageDetailActivity extends AppCompatActivity implements View.OnClickListener, KodeinAware {
     private String wrapperId;
     private AppCompatButton btnSubmit;
     private AppCompatEditText etComment;
+
+    private ImageDetailsViewModel mViewModel = null;
+//    private  ImageDetailsViewModelFactory mFactory = null;
+private val mFactory: ImageDetailsViewModelFactory by instance()
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +54,8 @@ public class ImageDetailActivity extends AppCompatActivity implements View.OnCli
                     .into(imageView);
         }
         wrapperId = getIntent().getStringExtra(ConstantUtil.KEY_IMAGE_WRAPPER_ID);
+
+       mViewModel =
 
     }
 
@@ -64,5 +80,24 @@ public class ImageDetailActivity extends AppCompatActivity implements View.OnCli
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @NotNull
+    @Override
+    public Kodein getKodein() {
+        return ((CavistaApplication) getApplication()).getKodein();
+    }
+
+    @NotNull
+    @Override
+    public KodeinContext<?> getKodeinContext() {
+        return getKodein().getKodeinContext();
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public KodeinTrigger getKodeinTrigger() {
+        return getKodein().getKodeinTrigger();
     }
 }
