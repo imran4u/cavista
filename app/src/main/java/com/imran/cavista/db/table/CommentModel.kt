@@ -10,7 +10,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "comment_table")
 class CommentModel(
-    @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "comment") val comment: String,
     @ColumnInfo(name = "image_id") val imageId: String
-)
+) {
+    @PrimaryKey(autoGenerate = true)
+    var id: Int? = null
+}

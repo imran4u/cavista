@@ -36,8 +36,7 @@ import org.kodein.di.generic.instance
 class ImageListActivity : AppCompatActivity(), KodeinAware {
 
     private lateinit var mViewModel: ImageListViewModel
-//    private val mFactory: ImageListViewModelFactory by instance()
-    private val mFactory: ImageDetailsViewModelFactory by instance()
+    private val mFactory: ImageListViewModelFactory by instance()
     override val kodein by kodein()
     private lateinit var mBinding: ActivityListImageBinding
     private lateinit var mImageListAdapter: ImageListAdapter

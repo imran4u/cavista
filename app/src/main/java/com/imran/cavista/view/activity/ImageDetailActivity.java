@@ -4,37 +4,40 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.imran.cavista.R;
-import com.imran.cavista.application.CavistaApplication;
+import com.imran.cavista.db.CommentDatabase;
+import com.imran.cavista.db.table.CommentModel;
 import com.imran.cavista.factory.ImageDetailsViewModelFactory;
+import com.imran.cavista.repository.CommentRepository;
 import com.imran.cavista.util.ConstantUtil;
 import com.imran.cavista.viewmodel.ImageDetailsViewModel;
 
-import org.jetbrains.annotations.NotNull;
-import org.kodein.di.Kodein;
-import org.kodein.di.KodeinAware;
-import org.kodein.di.KodeinContext;
-import org.kodein.di.KodeinTrigger;
+import java.util.List;
+
 
 /**
  * Created by imran on 2020-09-25.
  */
-public class ImageDetailActivity extends AppCompatActivity implements View.OnClickListener, KodeinAware {
+public class ImageDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private String wrapperId;
     private AppCompatButton btnSubmit;
     private AppCompatEditText etComment;
+    private TextView prevComment;
 
     private ImageDetailsViewModel mViewModel = null;
-//    private  ImageDetailsViewModelFactory mFactory = null;
-private val mFactory: ImageDetailsViewModelFactory by instance()
+    private ImageDetailsViewModelFactory mFactory = null;
 
 
     @Override
@@ -44,7 +47,9 @@ private val mFactory: ImageDetailsViewModelFactory by instance()
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getIntent().getStringExtra(ConstantUtil.KEY_IMAGE_TITLE));
         btnSubmit = findViewById(R.id.btnSubmit);
+        btnSubmit.setOnClickListener(this);
         etComment = findViewById(R.id.etComment);
+        prevComment = findViewById(R.id.prevComment);
         ImageView imageView = findViewById(R.id.imageView);
         String imageUrl = getIntent().getStringExtra(ConstantUtil.KEY_IMAGE_LINK);
         if (imageUrl != null) {
@@ -54,9 +59,48 @@ private val mFactory: ImageDetailsViewModelFactory by instance()
                     .into(imageView);
         }
         wrapperId = getIntent().getStringExtra(ConstantUtil.KEY_IMAGE_WRAPPER_ID);
+        CommentDatabase database = CommentDatabase.Companion.getDatabase(this);
+        mFactory = new ImageDetailsViewModelFactory(new CommentRepository(database));
+        mViewModel = new ViewModelProvider(this, mFactory).get(ImageDetailsViewModel.class);
+        initialiseObserver();
 
-       mViewModel =
+    }
 
+    private void initialiseObserver() {
+        mViewModel.getErrorLiveDat().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String message) {
+                Toast.makeText(ImageDetailActivity.this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+        mViewModel.getCommentsLiveData().observe(this, new Observer<List<CommentModel>>() {
+            @Override
+            public void onChanged(List<CommentModel> commentModels) {
+                if (commentModels != null && commentModels.size() > 0) {
+                    prevComment.setVisibility(View.VISIBLE);
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("Previous comments:- \n");
+                    for (int i = 0; i < commentModels.size(); i++) {
+                        CommentModel model = commentModels.get(i);
+                        builder.append(model.getComment()).append("\n");
+                    }
+                    prevComment.setText(builder.toString());
+                } else {
+                    prevComment.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
+        mViewModel.getInsertResultLiveData().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                if (aBoolean == true) {
+                    mViewModel.getCommentAsync(wrapperId);
+                }
+            }
+        });
+        mViewModel.getCommentAsync(wrapperId);
     }
 
 
@@ -68,10 +112,10 @@ private val mFactory: ImageDetailsViewModelFactory by instance()
     }
 
     private void saveComment() {
-        if (etComment.getText().length() > 0) {
-            // TODO: insert in database
+        final String commentMessage = etComment.getText().toString();
+        if (commentMessage.length() > 0) {
+            mViewModel.insertCommentAsy(commentMessage, wrapperId);
         }
-
     }
 
     @Override
@@ -82,22 +126,4 @@ private val mFactory: ImageDetailsViewModelFactory by instance()
         return super.onOptionsItemSelected(item);
     }
 
-
-    @NotNull
-    @Override
-    public Kodein getKodein() {
-        return ((CavistaApplication) getApplication()).getKodein();
-    }
-
-    @NotNull
-    @Override
-    public KodeinContext<?> getKodeinContext() {
-        return getKodein().getKodeinContext();
-    }
-
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public KodeinTrigger getKodeinTrigger() {
-        return getKodein().getKodeinTrigger();
-    }
 }

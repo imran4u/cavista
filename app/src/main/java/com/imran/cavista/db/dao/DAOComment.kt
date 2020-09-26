@@ -16,6 +16,6 @@ interface DAOComment {
     suspend fun insertComment(comment: CommentModel)
 
     @Query("SELECT * FROM comment_table WHERE image_id =:imageId")
-    fun getCommentList(imageId: String?) : List<CommentModel>
+    suspend fun getCommentList(imageId: String?) : List<CommentModel>
 
 }
